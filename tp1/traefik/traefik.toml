@@ -1,0 +1,24 @@
+checkNewVersion = true
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+    [[entryPoints.https.tls.certificates]]
+      certFile = "/certs/b3.swarm.crt"
+      keyFile = "/certs/b3.swarm.key"
+
+[web]
+address = ":8080"
+watch = true
+
+[docker]
+endpoint = "tcp://127.0.0.1:2375"
+domain = "b3.swarm"
+watch = true
+swarmmode = true
