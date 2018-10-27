@@ -369,7 +369,7 @@ touch /data/traefik/docker-compose.yml
 ```
 openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/certs/b3.swarm.key -out /data/traefik/certs/b3.swarm.crt
 ```
-* editer le fichier [`/data/traefik/traefik.toml`](./traefik.traefik.toml)
+* editer le fichier [`/data/traefik/traefik.toml`](./traefik/traefik.toml)
 * editer le fichier [`/data/traefik/docker-compose.yml`](./traefik/docker-compose.yml)
 
 * lancer une stack Traefik à l'aide du `docker-compose.yml`
@@ -380,7 +380,9 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/c
 
 Adaptez le `docker-compose.yml` de l'app Python pour tourner derrière Traefik en HTTPS uniquement.
 
-# Backup ?
+# Registry again
 
-# TODO
+Faites tourner le registre en HTTPS derrière Traefik.
+
+# TODO : Backup ?
 

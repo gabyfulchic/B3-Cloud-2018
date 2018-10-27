@@ -68,8 +68,3 @@
     * un peu de sécu ?
     * un peu de réseau ?
 
-  * but : gestion de SI en environnnement hybride
-    * hard : gestion de réseaux/hyperviseurs
-    * gestion du provisionning
-    * déploiements applicatifs répétables et uniformes
-    * infra immuables ?
