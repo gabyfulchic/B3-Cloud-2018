@@ -385,4 +385,4 @@ Adaptez le `docker-compose.yml` de l'app Python pour tourner derrière Traefik e
 Faites tourner le registre en HTTPS derrière Traefik.
 
 # TODO : Backup ?
-
+# TOODO : llinks for every techno
