@@ -69,7 +69,7 @@
     * un peu de réseau ?
 
   * but : gestion de SI en environnnement hybride
-    * hard : gestion de réseaux/hyp
+    * hard : gestion de réseaux/hyperviseurs
     * gestion du provisionning
-    * services d'infra (LDAP, CM master, autres)
-    * applicatifs, clustering app hybride (BDD, LoadBalancers, etc.)
+    * déploiements applicatifs répétables et uniformes
+    * infra immuables ?
