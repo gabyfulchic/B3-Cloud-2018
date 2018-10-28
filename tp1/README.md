@@ -20,7 +20,7 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
 
 * récolte et visualisation de data (+ alerting?)
 
-**PRENEZ DES NOTES DE VOS AVANCEES**
+**!!! PRENEZ DES NOTES DE VOS AVANCEES !!!**
 
 # Notions/Technos
 * Système
@@ -49,11 +49,10 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
   * Traefik (microservices-oriented reverse proxy)
   * Keepalived (Virtual IP)
 
-* Un peu sous le capot, on s'attardera pas dessus : 
+* Un peu sous le capot, entre autres, on s'attardera pas dessus : 
   * systemd
   * torcx
   * CoreOS Ignition
-
 
 # Prerequisites
 
@@ -135,8 +134,8 @@ docker stack deploy python_dirty_app -c docker-compose.yml
   * demandez une connexion à une instance de Docker Swarm pour récupérer votre token
   * utilisez un conteneur Docker Weave([toujours la même page](https://www.weave.works/docs/cloud/latest/install/docker-swarm/)) avec votre token
     * celui-ci va déployer  une stack sur votre swarm et s'auto-détruire
-  * le conteneur Weave va utiliser votre swarm pour lancer des services. Regardez et expliquez un peu ce qu'il vient de se passer.
-    * comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?
+  * le conteneur Weave va utiliser votre swarm pour lancer des services.
+    * **Q1 : comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?**
   * **une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie**. Explorez un peu y'a une tonne d'infos. 
 
 # CEPH
