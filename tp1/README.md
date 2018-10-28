@@ -64,17 +64,17 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
 * customisez le Vagrantfile pour : 
   * ajouter un dique de 10Go
 * pour gagner du temps par la suite, vous pouvez aussi customisez la box utilisée afin d'y intégrer les images `docker` suivantes :
-  * `ceph/daemon`
-  * `osixia/keepalived:1.3.5`
-  * `traefik:latest`
+  * [`ceph/daemon`](https://hub.docker.com/r/ceph/daemon/)
+  * [`osixia/keepalived:1.3.5`](https://github.com/osixia/docker-keepalived)
+  * [`traefik:latest`](https://hub.docker.com/_/traefik/)
 
-* Créez ensuite 5 machines à l'aide de ce `Vagrantfile` (ça se fait facilement à l'aide d'une variable déjà créée dans le fichier).
+* Créez ensuite **5 machines** à l'aide de ce `Vagrantfile` (ça se fait facilement à l'aide d'une variable déjà créée dans le fichier).
 
 # Docker Swarm
 
-Docker est déjà installé par défaut sur CoreOS. Inspectez sa configuration (unité de service `systemd` et `docker info`).  
+[Docker est déjà installé par défaut sur CoreOS](https://coreos.com/os/docs/latest/getting-started-with-docker.html). Inspectez sa configuration (unité de service `systemd` et `docker info`).  
 
-Pour rappel, Docker Swarm permet de mettre en place de la haute disponibilité au niveau du lancement et de l'entretien des conteneurs. Nous allons mettre en place un swarm de 5 noeuds : 3 managers et 2 workers. Le cluster restera sain tant que 2 managers seront en vie.
+Pour rappel, [Docker Swarm](https://docs.docker.com/engine/swarm/#feature-highlights) permet de mettre en place de la haute disponibilité au niveau du lancement et de l'entretien des conteneurs. Nous allons mettre en place **un swarm de 5 noeuds** : 3 managers et 2 workers. Le cluster restera sain tant que 2 managers seront en vie.
 
 ## Mise en place
 
@@ -82,7 +82,7 @@ Configurez :
 * le `experimental` mode de Docker pour pouvoir récupérer des métriques (voir [dockerd config](https://docs.docker.com/engine/reference/commandline/dockerd/))
   * ajoutez aussi la clause `metrics_addr` et sa valeur `0.0.0.0:9323`
 
-* un swarm avec 3 managers et 2 workers.
+* **un swarm avec 3 managers et 2 workers.**
 ```
 # Sur votre premier manager :
 docker swarm init --advertise-addr <IP_HOST_ONLY>
@@ -112,7 +112,7 @@ docker swarm join-token worker
 
 # Weave Cloud
 
-Weave Cloud permet d'accéder à des fonctionnalités de monitoring et métrologie directement depuis une interface dans le cloud (du SaaS donc :)). 
+[Weave Cloud](https://cloud.weave.works/signup) permet d'accéder à des fonctionnalités de monitoring et métrologie directement depuis une interface dans le cloud (du SaaS donc :)). 
 
 * utiliser [Weave Cloud](https://www.weave.works/docs/cloud/latest/install/docker-swarm/) pour monitorer votre déploiement Swarm
   * il vous faudra un compte Weave
@@ -120,29 +120,30 @@ Weave Cloud permet d'accéder à des fonctionnalités de monitoring et métrolog
   * demandez une connexion à une instance de Docker Swarm pour récupérer votre token
   * utilisez un conteneur Docker Weave([toujours la même page](https://www.weave.works/docs/cloud/latest/install/docker-swarm/)) avec votre token
     * celui va déployer  une stack sur votre swarm et s'auto-détruire
-  * le conteneur Weave va utiliser votre swarm pour lancer des services. Regardez et expliquez un peu ce qu'il vient de se passer. 
-  * une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie. Explorez un peu y'a une tonne d'infos. 
+  * le conteneur Weave va utiliser votre swarm pour lancer des services. Regardez et expliquez un peu ce qu'il vient de se passer.
+    * comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?
+  * **une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie**. Explorez un peu y'a une tonne d'infos. 
 
 
 # CEPH
 
 ## Présentation
 
-CEPH est un outil permettant de mettre en place (notamment) un système de fichiers distribués. Plutôt que d'avoir une partition locale utilisé sur un filesystem local, nous allons mettre en commun des partitions (en réalité, des blocs) à travers le réseau, et rendre le tout accessible sur tous nos hôtes comme une simple partition.  
+[CEPH](https://ceph.com/) est un outil permettant de mettre en place (notamment) un système de fichiers distribué ; plutôt que d'avoir une partition locale utilisé sur un filesystem local, nous allons mettre en commun des partitions (en réalité, des blocs) à travers le réseau, et rendre le tout accessible sur tous nos hôtes comme une simple partition.  
 
-CEPH est un outil complexe, il se décompose en plusieurs entités que nous installerons séparément : 
-* monitors : sont en charge de maintenir les cartes représentant le cluster (crucial pour que les démons CEPH soit synchro)
+**CEPH est un outil complexe**, il se décompose en plusieurs entités que nous installerons séparément : 
+* *monitors* : sont en charge de maintenir les cartes représentant le cluster (crucial pour que les démons CEPH soit synchro)
   * 3 suffiront pour notre petit lab
-* managers : récupère et expose des métriques, ainsi que l'état du cluster
+* *managers* : récupère et expose des métriques, ainsi que l'état du cluster
   * 3 managers aussi, sur les mêmes noeuds que les monitors
-* OSD : le coeur de l'outil, les OSDs sont en charge de stocker de la donnée (et d'autres opération avancées comme la réplication, la restauration etc.)
+* *OSD* : le coeur de l'outil, les OSDs sont en charge de stocker de la donnée (et d'autres opération avancées comme la réplication, la restauration etc.)
   * sur TOUS les noeuds où du stockage est dispo, sur tous nos noeuds donc
-* MDS : ce sont les serveurs de metadata, indispensable pour utiliser de façon simple le filesystem de type `ceph`
+* *MDS* : ce sont les serveurs de metadata, indispensable pour utiliser de façon simple le filesystem de type `ceph`
   * sur tous les noeuds
 
 Le fonctionnement en détail de CEPH dépasse le cadre du cours, nous allons donc mettre en place un setup simple.  
 
-Vuuuu qu'on est des guerriers on va le mettre en place à l'aide de Docker :)
+Vuuuu qu'on est des guerriers **on va le mettre en place à l'aide de Docker** :)
 
 ## Mise en place
 
@@ -264,14 +265,15 @@ mount -a`
 
 **Le répertoire `/data` devrait être accessible sur les noeuds.**  
 
-**Conseil : utilisez le pour stocker TOUTES vos configurations, y compris vos conf CEPH**
-
+**Conseil : utilisez le pour stocker TOUTES vos configurations par la suite, y compris vos confs CEPH**
 
 ### 6. Un peu de réflexion
 
-* proposer une façon d'automatiser cette conf (vagrant ? swarm stack ? autres ?)
+* proposer une façon d'automatiser cette conf (Vagrant ? Swarm stack ? autres ?)
 
-* nous allons utiliser ce répertoire pour stocker des données sur le FS des noeuds Docker. Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ?
+* nous allons utiliser ce répertoire pour stocker des données sur le FS des noeuds Docker. Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
+  * actuel : CEPH --*MDS*--> Host --`-v`--> conteneur
+  * demandé : CEPH --*MDS*--`-v--`> conteneur
 
 # Registry service
 
@@ -385,6 +387,7 @@ Adaptez le `docker-compose.yml` de l'app Python pour tourner derrière Traefik e
 Faites tourner le registre en HTTPS derrière Traefik.
 
 # TODO : Backup ?
-# TOODO : llinks for every techno
 # TODO : plus de qquestions ouvertes
 # TODO : deplooy python app before weave cloud for tests
+# TODO : test weavecloud
+# TODO : numéroter + trouver un truc pour rendre visible les q ouvertes
