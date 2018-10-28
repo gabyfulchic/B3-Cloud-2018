@@ -110,6 +110,21 @@ docker swarm join-token worker
 * `docker service logs SERVICE`
   * affiche les logs d'un service (basé sur `docker logs`)
 
+# Dumb service - Part 1
+
+Tout au long du TP, nous déploierons ce service, mais en changeant notre process de déploiement à chaque fois.  
+
+Tous nos services, nos applicatifs, tourneront sous la forme de stacks ou services Swarm. On crée un `docker-compose.yml` pour chacune des stacks. On trouvera aussi un répertoire de donnée pour chacune d'entre elles.
+
+* utilisez le `compose.yml` fourni afin d'avoir une stack de test (provient de la correction du TP2 Conteneurisation). Il pop l'archi suivante : `BDD <--- AppPython <--- NGINX`
+* les images utilisées dans le `docker-compose.yml` doivent être accessibles sur tous les noeuds.
+
+```
+docker stack deploy python_dirty_app -c docker-compose.yml
+```
+
+* une fois démarrée l'appli devrait être joignable sur le port 8080 de votre cluster
+
 # Weave Cloud
 
 [Weave Cloud](https://cloud.weave.works/signup) permet d'accéder à des fonctionnalités de monitoring et métrologie directement depuis une interface dans le cloud (du SaaS donc :)). 
@@ -119,11 +134,10 @@ docker swarm join-token worker
   * inscrivez-vous (n'hésitez pas à utiliser un mail jetable :) )
   * demandez une connexion à une instance de Docker Swarm pour récupérer votre token
   * utilisez un conteneur Docker Weave([toujours la même page](https://www.weave.works/docs/cloud/latest/install/docker-swarm/)) avec votre token
-    * celui va déployer  une stack sur votre swarm et s'auto-détruire
+    * celui-ci va déployer  une stack sur votre swarm et s'auto-détruire
   * le conteneur Weave va utiliser votre swarm pour lancer des services. Regardez et expliquez un peu ce qu'il vient de se passer.
     * comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?
   * **une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie**. Explorez un peu y'a une tonne d'infos. 
-
 
 # CEPH
 
@@ -272,34 +286,41 @@ mount -a`
 * proposer une façon d'automatiser cette conf (Vagrant ? Swarm stack ? autres ?)
 
 * nous allons utiliser ce répertoire pour stocker des données sur le FS des noeuds Docker. Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
-  * actuel : CEPH --*MDS*--> Host --`-v`--> conteneur
-  * demandé : CEPH --*MDS*--`-v--`> conteneur
+  * actuel : CEPH --*MDS*--> Host --`run -v`--> conteneur
+  * demandé : CEPH --*MDS*--`run -v`--> conteneur
 
-# Registry service
+# Registry - Part 1
 
-On va avoir besoin d'un registre joignable sur tous les noeuds du Swarm :
-* un `service` swarm fait appel à des conteneurs, donc à des images
-* ces images doivent être disponibles depuis tous les noeuds Docker
-* on pourrait les `docker pull` à la main, on va préférer utiliser un registre 
+Pour lancer un service à travers le swarm, tous les noeuds doivent pouvoir pull le conteneur. Plusieurs choix alors :
+* se log sur tous les noeuds et récupérer l'image souhaitée, partout (`docker pull`, ou archive, ou autres)
+* publier l'image sur un registre public/joignable sur internet
+* **monter un registre soi-même. On part sur cette option.**  
+
+Le [Docker Registry](https://docs.docker.com/registry/) (ou simplement *registre*) doit être joignable sur tous les noeuds du Swarm. 
 
 Pour rappel le Docker Registry permet d'héberger et distribuer des images Docker.  
 
-On va en lancer un sur notre swarm, qui pourra être joignable en local sur tous les hôtes : 
+On va en lancer un sur notre swarm, qui pourra être joignable en local (`127.0.0.1:5000`) sur tous les hôtes : 
 
 ```
 docker service create --name registry --publish published=5000,target=5000 registry:2
 ```
+Normalement, un `curl 127.0.0.1/v2/`  devrait fonctionner et retourner `{}` sur tous les hôtes.  
 
-Normalement, un `curl 127.0.0.1/v2/`  devrait fonctionner et retourner `{}` sur tous les hôtes.
+Expliquez :
+* où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir)
+* pourquoi le service est accessible depuis tous les hôtes ?
 
+# Dumb service - Part 2
 
-# Dumb service
+Faites tourner le Dumb Service mais :
+* Hébergez les images du Dumb Service dans le registre
+* Utilisez le répertoire `/data` pour stocker ses données (`docker-compose.yml`, configurations, applications, données)
+* Observer son évolution sur Weave Cloud
 
-* utilisez le `compose.yml` fourni afin d'avoir une stack de test (provient du TP2)
-
-* créez un répertoire `/data/python_app`
 
 ```
+cd /data/python_app/
 docker-compose build
 docker-compose push
 docker stack deploy python_dirty_app -c docker-compose.yml
@@ -309,7 +330,7 @@ docker stack deploy python_dirty_app -c docker-compose.yml
 
 Actuellement, un service est joignable sur toutes les IPs des membres du Swarm. Ok, mais on dit quoi à notre DNS ?  
 
-On va mettre en place une IP Virtuelle, que porteront tous nos serveurs, à l'aide de Keepalived. Vu qu'on est des hipsters : conteneurs !
+On va mettre en place une **IP Virtuelle**, que porteront tous nos serveurs, à l'aide de [Keepalived](http://www.keepalived.org/). Vu qu'on est des hipsters : conteneurs !
 
 En admettant la config suivante : 
 * IP Virtuelle voulue sur `172.17.8.100`
@@ -328,17 +349,17 @@ docker run -d --name keepalived --restart=always \
 * Lancez la commande sur tous vos hôtes, en modifiant la priorité à chaque fois
   * **une fois fait, vous n'accéderez à votre cluster plus qu'avec l'ip virtuelle**
 
-* Expliquez le principe de priorité au sein de Keepalived
-
-* Renseignez-vous sur `vrrp`
+* Expliquez :
+  * le principe de priorité au sein de Keepalived ?
+  * le fonctionnement simplifié de `vrrp` ?
 
 # Show me your metrics
 
-Je veux un tableau de bord. Avec des chiffres. Partout.  
+Je veux un tableau de bord. Avec des chiffres. **Partout.**  
 
 Ici, afin d'avoir quelque chose de rapidement fonctionnel, on va réutiliser un projet existant et très bien configuré : [swarmprom](https://github.com/stefanprodan/swarmprom).  
 
-Copy/paste du README.md du projet :
+Copy/paste du `README.md` du projet :
 
 * prometheus (metrics database) http://<swarm-ip>:9090
 * grafana (visualize metrics) http://<swarm-ip>:3000
@@ -349,15 +370,17 @@ Copy/paste du README.md du projet :
 * unsee (alert manager dashboard) http://<swarm-ip>:9094
 * caddy (reverse proxy and basic auth provider for prometheus, alertmanager and unsee)
 
-* Je vous laisse suivre la doc du README pour un déploiement simple. Baladez-vous un peu, surtout sur Grafana qui offre de précieuses visualisations.  
+* Je vous laisse suivre la doc du `README.md` pour un déploiement simple. Baladez-vous un peu, surtout sur Grafana qui offre de précieuses visualisations.  
 
-* Expliquez ce qu'est un 'collector' et détaillez un peu le fonctionnement de Prometheus. 
+* Expliquez 
+  * ce qu'est un 'collector'
+  * un peu plus en détail le fonctionnement de [Prometheus](https://prometheus.io/)
 
 # Traefik
 
-Traefik est un reverse proxy dédié aux environnements micro-service.   
+[Traefik](https://traefik.io/) est un reverse proxy dédié aux environnements micro-service.   
 
-Au sein d'un Swarm, il est capable de détecter dynamiquement les nouveaux services qu'il doit servir, grâce à un système de labels.  
+Au sein d'un Swarm, il est capable de détecter dynamiquement les nouveaux services qu'il doit servir, grâce à un système de *labels*.  
 
 Mettons le en place : 
 * architecture de fichiers/dossiers
@@ -376,18 +399,20 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/c
 
 * lancer une stack Traefik à l'aide du `docker-compose.yml`
 
-* explorer l'interface de Traefik
+* explorer l'interface de Traefik, expliquez un peu son fonctionnement.
 
-# Dumb app again
+# Dumb app - Part 3
 
 Adaptez le `docker-compose.yml` de l'app Python pour tourner derrière Traefik en HTTPS uniquement.
 
-# Registry again
+# Registry - Part 2
 
 Faites tourner le registre en HTTPS derrière Traefik.
 
+# Registry - Part 3
+
+Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry seul.
+
 # TODO : Backup ?
-# TODO : plus de qquestions ouvertes
-# TODO : deplooy python app before weave cloud for tests
 # TODO : test weavecloud
 # TODO : numéroter + trouver un truc pour rendre visible les q ouvertes
