@@ -191,6 +191,24 @@ ceph/daemon mon
 * suite à ça, déplacer tout le contenu de `/etc/ceph/` sur **tous les autres noeuds**
 * exécuter de nouveau la commande `docker run` ci-dessus sur deux autres noeuds (ce sera vos 3 *monitors*)
 * n'oubliez pas de changer la variable `MON_IP` sur chacun de vos 3 *monitors*
+* check :
+```
+docker exec ceph-mon ceph status
+  cluster:
+    id:     faba0138-849f-491d-8ba3-3ce1b92cff19
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum core-01,core-02,core-03
+    mgr: no daemons active
+    osd: 0 osds: 0 up, 0 in
+ 
+  data:
+    pools:   0 pools, 0 pgs
+    objects: 0  objects, 0 B
+    usage:   0 B used, 0 B / 0 B avail
+    pgs: 
+```
 
 ### 2. Managers
 
@@ -205,6 +223,24 @@ docker run -d --net=host \
 --name="ceph-mgr" \
 --restart=always \
 ceph/daemon mgr
+```
+* check
+```
+docker exec ceph-mon ceph status
+  cluster:
+    id:     faba0138-849f-491d-8ba3-3ce1b92cff19
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum core-01,core-02,core-03
+    mgr: core-01(active), standbys: core-03, core-02
+    osd: 0 osds: 0 up, 0 in
+ 
+  data:
+    pools:   0 pools, 0 pgs
+    objects: 0  objects, 0 B
+    usage:   0 B used, 0 B / 0 B avail
+    pgs:     
 ```
 
 ### 3. OSDs
