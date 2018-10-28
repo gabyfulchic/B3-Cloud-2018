@@ -436,6 +436,10 @@ Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry s
   * des développeurs bossent sur le `Dumb Service`
   * test des applications quand on met à jour/change la configuration
 
+# Récap
+
+* mettez-moi tout ça au clair, proposez une mini-doc permettant de déployer un nouveau service sur le Swarm, qui sera monitoré, sauvegardé, et en HA. 
+
 # TODO
 * test weavecloud
 * Rolling update
