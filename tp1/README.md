@@ -24,7 +24,9 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
 
 * récolte et visualisation de data (+ alerting?)
 
-**!!! PRENEZ DES NOTES DE VOS AVANCEES !!!**
+**!!! PRENEZ DES NOTES DE VOS AVANCEES !!!**  
+
+Le rendu s'effectuera à travers un dépôt GitHub (ou autres, mais un dépôt `git` que je peux atteindre). Le format `md` est donc tout indiqué pour votre compte-rendu, mais vous restez libres :)
 
 # Notions/Technos
 * Système
@@ -438,7 +440,9 @@ Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry s
 
 # Récap
 
-* mettez-moi tout ça au clair, proposez une mini-doc permettant de déployer un nouveau service sur le Swarm, qui sera monitoré, sauvegardé, et en HA. 
+* mettez-moi tout ça au clair, proposez : 
+  * une mini-doc permettant de déployer un nouveau service sur le Swarm, qui sera monitoré, sauvegardé, et en HA
+  * une mini-doc permettant d'ajouter un noeud au swarm
 
 # TODO
 * test weavecloud
