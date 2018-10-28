@@ -18,6 +18,10 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
   * conformité
   * sécurité 
 
+* robustesse
+  * stockage redondé
+  * applications hautement disponibles
+
 * récolte et visualisation de data (+ alerting?)
 
 **!!! PRENEZ DES NOTES DE VOS AVANCEES !!!**
@@ -29,7 +33,7 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
 * Provisionning/Templating
   * CoreOS Ignition (cloud config bootstrap)
   * Vagrant (VM provisionning)
-    * Terraform would have been better but does not pair very well with dev hypervisor like VBox
+    * [Terraform](https://www.terraform.io/) would have been better but does not pair very well with dev hypervisor like VBox
 
 * Applicative packaging/Deployment
   * Docker (packaging)
@@ -40,7 +44,7 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
   * CEPH (distributed file-system)
 
 * Monitoring/Métrologie
-  * Weave Cloud (monitoring SaSS)
+  * Weave Cloud (monitoring SaaS)
   * Prometheus (local data storage and distribution)
   * Grafana (data visualisation)
   * + autres
@@ -67,7 +71,7 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
   * [`osixia/keepalived:1.3.5`](https://github.com/osixia/docker-keepalived)
   * [`traefik:latest`](https://hub.docker.com/_/traefik/)
 
-* Créez ensuite **5 machines** à l'aide de ce `Vagrantfile` (ça se fait facilement à l'aide d'une variable déjà créée dans le fichier).
+* Créez ensuite **5 machines** à l'aide de ce `Vagrantfile` (ça se fait facilement à l'aide d'une variable déjà créée dans le fichier `Vagrantfile`).
 
 # Docker Swarm
 
