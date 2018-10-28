@@ -135,8 +135,9 @@ docker stack deploy python_dirty_app -c docker-compose.yml
   * utilisez un conteneur Docker Weave([toujours la même page](https://www.weave.works/docs/cloud/latest/install/docker-swarm/)) avec votre token
     * celui-ci va déployer  une stack sur votre swarm et s'auto-détruire
   * le conteneur Weave va utiliser votre swarm pour lancer des services.
-    * **Q1 : comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?**
-  * **une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie**. Explorez un peu y'a une tonne d'infos. 
+  * **Q1 : comment ce conteneur a-t-il pu lancer des conteneurs sur votre hôte ?**  
+
+Une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie. Explorez un peu y'a une tonne d'infos. 
 
 # CEPH
 
@@ -282,7 +283,9 @@ mount -a`
 
 ### 6. Un peu de réflexion
 
-* proposer une façon d'automatiser cette conf (Vagrant ? Swarm stack ? autres ?)
+* **Q2 : expliquer rapidement le principe d'un filesystem distribué**  
+
+* **Q3 : proposer une façon d'automatiser cette conf CEPH** (Vagrant ? Swarm stack ? autres ?)
 
 * nous allons utiliser ce répertoire pour stocker des données sur le FS des noeuds Docker. Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
   * actuel : CEPH --*MDS*--> Host --`run -v`--> conteneur
@@ -307,8 +310,8 @@ docker service create --name registry --publish published=5000,target=5000 regis
 Normalement, un `curl 127.0.0.1/v2/`  devrait fonctionner et retourner `{}` sur tous les hôtes.  
 
 Expliquez :
-* où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir)
-* pourquoi le service est accessible depuis tous les hôtes ?
+* **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir)**
+* **Q5 : pourquoi le service est accessible depuis tous les hôtes ?**
 
 # Dumb service - Part 2
 
@@ -349,8 +352,8 @@ docker run -d --name keepalived --restart=always \
   * **une fois fait, vous n'accéderez à votre cluster plus qu'avec l'ip virtuelle**
 
 * Expliquez :
-  * le principe de priorité au sein de Keepalived ?
-  * le fonctionnement simplifié de `vrrp` ?
+  * **Q6 : le principe de priorité au sein de Keepalived**
+  * **Q7 : le fonctionnement simplifié de `vrrp`** (schéma si vous voulez)
 
 # Show me your metrics
 
@@ -372,8 +375,8 @@ Copy/paste du `README.md` du projet :
 * Je vous laisse suivre la doc du `README.md` pour un déploiement simple. Baladez-vous un peu, surtout sur Grafana qui offre de précieuses visualisations.  
 
 * Expliquez 
-  * ce qu'est un 'collector'
-  * un peu plus en détail le fonctionnement de [Prometheus](https://prometheus.io/)
+  * **Q8 : ce qu'est un 'collector' dans ce contexte**
+  * **Q9 : un peu plus en détail le fonctionnement de [Prometheus](https://prometheus.io/)**
 
 # Traefik
 
@@ -398,7 +401,8 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/c
 
 * lancer une stack Traefik à l'aide du `docker-compose.yml`
 
-* explorer l'interface de Traefik, expliquez un peu son fonctionnement.
+* explorer l'interface de Traefik
+* **Q10: expliquez un peu son fonctionnement**
 
 # Dumb app - Part 3
 
@@ -412,6 +416,16 @@ Faites tourner le registre en HTTPS derrière Traefik.
 
 Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry seul.
 
-# TODO : Backup ?
+# Backup
+
+* **Q11 : Proposez une solution permettant de sauvegarder nos applications**. On veut garder :
+  * les configurations
+  * les données
+  * les outils de déploiement
+  * les applications elles-mêmes
+
+# Gitlab
+
+* **Q12 : Expliquez comment GitLab pourrait se coupler à l'infra actuelle**
+
 # TODO : test weavecloud
-# TODO : numéroter + trouver un truc pour rendre visible les q ouvertes
