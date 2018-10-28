@@ -113,7 +113,7 @@ docker swarm join-token worker
 * `docker service logs SERVICE`
   * affiche les logs d'un service (basé sur `docker logs`)
 
-# Dumb service - Part 1
+# Dumb Service - Part 1
 
 Tout au long du TP, nous déploierons ce service, mais en changeant notre process de déploiement à chaque fois.  
 
@@ -317,7 +317,7 @@ Expliquez :
 * **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir)**
 * **Q5 : pourquoi le service est accessible depuis tous les hôtes ?**
 
-# Dumb service - Part 2
+# Dumb Service - Part 2
 
 Faites tourner le Dumb Service mais :
 * Hébergez les images du Dumb Service dans le registre
@@ -408,7 +408,7 @@ openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/c
 * explorer l'interface de Traefik
 * **Q10: expliquez un peu son fonctionnement**
 
-# Dumb app - Part 3
+# Dumb Service - Part 3
 
 Adaptez le `docker-compose.yml` de l'app Python pour tourner derrière Traefik en HTTPS uniquement.
 
@@ -431,5 +431,12 @@ Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry s
 # Gitlab
 
 * **Q12 : Expliquez comment GitLab pourrait se coupler à l'infra actuelle**
+* la question est très ouverte, c'est possible d'imaginer des tonnes de trucs ici. 
+* idées :
+  * des développeurs bossent sur le `Dumb Service`
+  * test des applications quand on met à jour/change la configuration
 
-# TODO : test weavecloud
+# TODO
+* test weavecloud
+* Rolling update
+* Deploy Wekan or other
