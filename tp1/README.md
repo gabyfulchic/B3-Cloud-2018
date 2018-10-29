@@ -145,7 +145,7 @@ docker stack deploy python_dirty_app -c docker-compose.yml
 
 Une fois lancé, RDV sur l'interface graphique de Weave pour voir la magie. Explorez un peu y'a une tonne d'infos. 
 
-# CEPH
+# A. CEPH ooooouuuuu...
 
 ## Présentation
 
@@ -333,6 +333,11 @@ mount -a`
   * actuel : CEPH --*MDS*--> Host --`run -v`--> conteneur
   * demandé : CEPH --*MDS*--`run -v`--> conteneur
 
+# B..... NFS
+Ou un simple partage NFS. Je ne donnerai pas d'instructions pour cette partie (très simple normalement). Pour les non-initiés, NFS (sobrement Network FileSystem) et un... système de fichiers sur le réseau :|. Il existe plusieurs articles sur internet qui expliquent comment le mettre en place, c'est plus easy qu'un CEPH.  
+
+Attention en revanche : NFS peut mal supporter les accès concurrents, surtout en écriture (vous pouvez monter votre partition NFS uniquement en lecture).
+
 # Registry - Part 1
 
 Pour lancer un service à travers le swarm, tous les noeuds doivent pouvoir pull le conteneur. Plusieurs choix alors :
@@ -352,8 +357,8 @@ docker service create --name registry --publish published=5000,target=5000 regis
 Normalement, un `curl 127.0.0.1/v2/`  devrait fonctionner et retourner `{}` sur tous les hôtes.  
 
 Expliquez :
-* **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir)**
-* **Q5 : pourquoi le service est accessible depuis tous les hôtes ?**
+* **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir ?)** Combien y'a-t-il de conteneurs lancés ? 
+* **Q5 : pourquoi le service est accessible depuis tous les hôtes ?** Documentez vous sur internet.
 
 # Dumb Service - Part 2
 
@@ -361,7 +366,6 @@ Faites tourner le Dumb Service mais :
 * Hébergez les images du Dumb Service dans le registre
 * Utilisez le répertoire `/data` pour stocker ses données (`docker-compose.yml`, configurations, applications, données)
 * Observer son évolution sur Weave Cloud
-
 
 ```
 cd /data/python_app/
@@ -466,21 +470,10 @@ Faites tourner une stack [Harbor](https://goharbor.io/) plutôt qu'un Registry s
   * les outils de déploiement
   * les applications elles-mêmes
 
-# Gitlab
-
-* **Q12 : Expliquez comment GitLab pourrait se coupler à l'infra actuelle**
-* la question est très ouverte, c'est possible d'imaginer des tonnes de trucs ici. 
-* idées :
-  * des développeurs bossent sur le `Dumb Service`
-  * test des applications quand on met à jour/change la configuration
+* Ici j'attends un peu de réflexion sur la question. Nous avons déjà des outils pour lancer n'importe quel applicatif (stack CoreOS + Docker + Swarm), et un répertoire de données accessibles sur tous nos hôtes (CEPH, NFS). Je ne veux pas un script `bash` qui fait du `rsync` :)
 
 # Récap
 
 * mettez-moi tout ça au clair, proposez : 
-  * une mini-doc permettant de déployer un nouveau service sur le Swarm, qui sera monitoré, sauvegardé, et en HA
-  * une mini-doc permettant d'ajouter un noeud au swarm
-
-# TODO
-* test weavecloud
-* Rolling update
-* Deploy Wekan or other
+  * une mini-doc permettant de déployer un nouveau service sur le Swarm, qui sera monitoré, sauvegardé, servi en HTTPS, et en HA
+  * une mini-doc permettant d'ajouter un noeud au swarm (rappel : il doit aussi avoir accès aux répertoire de données, être sauvegardé et monitoré)
