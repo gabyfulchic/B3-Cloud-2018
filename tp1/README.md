@@ -62,7 +62,7 @@ Le rendu s'effectuera à travers un dépôt GitHub (ou autres, mais un dépôt `
 
 # Prerequisites
 
-* mettez vous par deux et reliez vous avec un câble RJ, ça évitera de tout faire péter sur vos machines.
+* mettez vous par deux et reliez vous avec un câble RJ, ça évitera de tout faire péter sur vos machines. Mettez-vous dans un petit réseau en /24 on sera large :)
 
 * Récupérez le projet `git` https://github.com/coreos/coreos-vagrant.
 
