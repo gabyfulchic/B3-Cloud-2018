@@ -72,7 +72,7 @@ Le rendu s'effectuera à travers un dépôt GitHub (ou autres, mais un dépôt `
   * ajouter un dique de 10Go
   * utiliser une interface bridgé sur votre connexion Ethernet
     * vos hôtes et vos VMs vivront dans le même réseau (grâce au câble)
-* pour gagner du temps par la suite, vous pouvez aussi customisez la box utilisée afin d'y intégrer les images `docker` suivantes :
+* pour gagner du temps par la suite, vous pouvez aussi customiser la box utilisée afin d'y intégrer les images `docker` suivantes :
   * [`ceph/daemon`](https://hub.docker.com/r/ceph/daemon/)
   * [`osixia/keepalived:1.3.5`](https://github.com/osixia/docker-keepalived)
   * [`traefik:latest`](https://hub.docker.com/_/traefik/)
