@@ -11,7 +11,7 @@ Le but de ce TP est de déployer une stack applicative complexe reflétant les e
 
 * accessibilité
   * on accède aux services avec performance
-  * technos dédiées
+  * technos dédiées pour chaque fonction
 
 * automatisation
   * répétabilité
@@ -62,12 +62,16 @@ Le rendu s'effectuera à travers un dépôt GitHub (ou autres, mais un dépôt `
 
 # Prerequisites
 
+* mettez vous par deux et reliez vous avec un câble RJ, ça évitera de tout faire péter sur vos machines.
+
 * Récupérez le projet `git` https://github.com/coreos/coreos-vagrant.
 
 * explorez un peu le `Vagrantfile`
 
 * customisez le Vagrantfile pour : 
   * ajouter un dique de 10Go
+  * utiliser une interface bridgé sur votre connexion Ethernet
+    * vos hôtes et vos VMs vivront dans le même réseau (grâce au câble)
 * pour gagner du temps par la suite, vous pouvez aussi customisez la box utilisée afin d'y intégrer les images `docker` suivantes :
   * [`ceph/daemon`](https://hub.docker.com/r/ceph/daemon/)
   * [`osixia/keepalived:1.3.5`](https://github.com/osixia/docker-keepalived)
@@ -321,15 +325,15 @@ mount -a`
 
 **Le répertoire `/data` devrait être accessible sur les noeuds.**  
 
-**Conseil : utilisez le pour stocker TOUTES vos configurations par la suite, y compris vos confs CEPH**
+**Conseil : utilisez le pour stocker vos configurations par la suite (et applications)**
 
 ### 6. Un peu de réflexion
 
-* **Q2 : expliquer rapidement le principe d'un filesystem distribué**  
+* **Q2 : expliquer rapidement le principe d'un système de fichiers distribué** (distributed filesystem)  
 
-* **Q3 : proposer une façon d'automatiser cette conf CEPH** (Vagrant ? Swarm stack ? autres ?)
+* **Q3 : proposer une façon d'automatiser le déploiement cette conf CEPH** (Vagrant ? Swarm stack ? autres ?) Par ex, si on veut rajouter un noeud ?
 
-* nous allons utiliser ce répertoire pour stocker des données sur le FS des noeuds Docker. Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
+* QB1 : nous allons utiliser ce répertoire data pour stocker des données sur le FS des noeuds Docker (sur les hôtes). Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
   * actuel : CEPH --*MDS*--> Host --`run -v`--> conteneur
   * demandé : CEPH --*MDS*--`run -v`--> conteneur
 
@@ -337,6 +341,10 @@ mount -a`
 Ou un simple partage NFS. Je ne donnerai pas d'instructions pour cette partie (très simple normalement). Pour les non-initiés, NFS (sobrement Network FileSystem) et un... système de fichiers sur le réseau :|. Il existe plusieurs articles sur internet qui expliquent comment le mettre en place, c'est plus easy qu'un CEPH.  
 
 Attention en revanche : NFS peut mal supporter les accès concurrents, surtout en écriture (vous pouvez monter votre partition NFS uniquement en lecture).
+
+* **Q2 : expliquez le principe d'un partage NFS, quels pourraient être ses limites dans le cas d'un swarm comme le nôtre (qui peut être amené à grandir) ?**
+
+* **Q3 : proposez une façon d'automatiser le déploiement cette conf NFS**
 
 # Registry - Part 1
 
@@ -357,7 +365,7 @@ docker service create --name registry --publish published=5000,target=5000 regis
 Normalement, un `curl 127.0.0.1/v2/`  devrait fonctionner et retourner `{}` sur tous les hôtes.  
 
 Expliquez :
-* **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir ?)** Combien y'a-t-il de conteneurs lancés ? 
+* **Q4 : où est lancé le service réellement ? (sur quel hôte, et comment on fait pour savoir ?)** Combien y'a-t-il de conteneur(s) lancé(s) ? 
 * **Q5 : pourquoi le service est accessible depuis tous les hôtes ?** Documentez vous sur internet.
 
 # Dumb Service - Part 2
@@ -376,7 +384,7 @@ docker stack deploy python_dirty_app -c docker-compose.yml
 
 # Keepalived
 
-Actuellement, un service est joignable sur toutes les IPs des membres du Swarm. Ok, mais on dit quoi à notre DNS ?  
+Actuellement, un service est joignable sur toutes les IPs des membres du Swarm. Ok, mais une IP d'entrée unique ça serait pas mal non ?  
 
 On va mettre en place une **IP Virtuelle**, que porteront tous nos serveurs, à l'aide de [Keepalived](http://www.keepalived.org/). Vu qu'on est des hipsters : conteneurs !
 
@@ -388,8 +396,8 @@ En admettant la config suivante :
 ```
 docker run -d --name keepalived --restart=always \
   --cap-add=NET_ADMIN --net=host \
-  -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['172.17.8.101', '172.17.8.102', '172.17.8.103', '172.17.8.104', '172.17.8.105']" \
   -e KEEPALIVED_VIRTUAL_IPS=172.17.8.100 \
+  -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['172.17.8.101', '172.17.8.102', '172.17.8.103', '172.17.8.104', '172.17.8.105']" \
   -e KEEPALIVED_PRIORITY=200 \
   osixia/keepalived:1.3.5
 ```
@@ -398,8 +406,9 @@ docker run -d --name keepalived --restart=always \
   * **une fois fait, vous n'accéderez à votre cluster plus qu'avec l'ip virtuelle**
 
 * Expliquez :
-  * **Q6 : le principe de priorité au sein de Keepalived**
-  * **Q7 : le fonctionnement simplifié de `vrrp`** (schéma si vous voulez)
+  * **Q6 : que fait le `--net=host` de la commande exactement ? Je veux voir une utilisation de `nsenter` en réponse à cette question.** Pourquoi avoir besoin de ça sur Keepalived ? 
+  * Bonus : à quoi sert `--cap-add=NET_ADMIN` ?
+  * **Q7 : le principe de priorité au sein de Keepalived et le fonctionnement simplifié de `vrrp`** (schéma si vous voulez)
 
 # Show me your metrics
 
@@ -422,7 +431,7 @@ Copy/paste du `README.md` du projet :
 
 * Expliquez 
   * **Q8 : ce qu'est un 'collector' dans ce contexte**
-  * **Q9 : un peu plus en détail le fonctionnement de [Prometheus](https://prometheus.io/)**
+  * **Q9 : un peu plus en détail le fonctionnement de chacun des tools déployés par cette stack**
 
 # Traefik
 
@@ -438,7 +447,7 @@ mkdir /data/traefik/certs
 touch /data/traefik/traefik.toml
 touch /data/traefik/docker-compose.yml
 ```
-* générer une paire de clé/cert auto-signé. Utilisez une wildcard pour votre *COMMON NAME* (exemple : `*.b3.swarm`) : 
+* générer une paire de clé/cert auto-signé, vous vous en servirez pour la mise en palce de Traefik. Utilisez une wildcard pour votre *COMMON NAME* (exemple : `*.b3.swarm`) : 
 ```
 openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /data/traefik/certs/b3.swarm.key -out /data/traefik/certs/b3.swarm.crt
 ```
