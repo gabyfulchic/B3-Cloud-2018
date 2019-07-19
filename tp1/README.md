@@ -331,7 +331,7 @@ mount -a`
 
 * **Q2 : expliquer rapidement le principe d'un système de fichiers distribué** (distributed filesystem)  
 
-* **Q3 : proposer une façon d'automatiser le déploiement cette conf CEPH** (Vagrant ? Swarm stack ? autres ?) Par ex, si on veut rajouter un noeud ?
+* **Q3 : proposer une façon d'automatiser le déploiement de cette conf CEPH** (Vagrant ? Swarm stack ? autres ?) Par ex, si on veut rajouter un noeud ?
 
 * QB1 : nous allons utiliser ce répertoire data pour stocker des données sur le FS des noeuds Docker (sur les hôtes). Serait-il possible que nos conteneurs utilisent directement les volumes CEPH, sans passer par un volume de l'hôte ? Illustration
   * actuel : CEPH --*MDS*--> Host --`run -v`--> conteneur
@@ -342,7 +342,7 @@ Ou un simple partage NFS. Je ne donnerai pas d'instructions pour cette partie (t
 
 Attention en revanche : NFS peut mal supporter les accès concurrents, surtout en écriture (vous pouvez monter votre partition NFS uniquement en lecture).
 
-* **Q2 : expliquez le principe d'un partage NFS, quels pourraient être ses limites dans le cas d'un swarm comme le nôtre (qui peut être amené à grandir) ?**
+* **Q2 : expliquez le principe d'un partage NFS, quelles pourraient être ses limites dans le cas d'un swarm comme le nôtre (qui peut être amené à grandir) ?**
 
 * **Q3 : proposez une façon d'automatiser le déploiement cette conf NFS**
 
